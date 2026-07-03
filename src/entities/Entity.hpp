@@ -18,12 +18,11 @@ private:
     friend class EntityManager;
 
     const EntityTag mTag;
-    const std::size_t mId;
+    const usize mId;
     bool mIsAlive = true;
-
     ComponentTuple mComponents;
 
-    Entity(const EntityTag tag, const std::size_t id): mTag(tag), mId(id) {}
+    Entity(const EntityTag tag, const usize id): mTag(tag), mId(id) {}
 
 public:
     bool isAlive() const {
@@ -34,7 +33,7 @@ public:
         return mTag;
     }
 
-    std::size_t getId() const {
+    usize getId() const {
         return mId;
     }
 

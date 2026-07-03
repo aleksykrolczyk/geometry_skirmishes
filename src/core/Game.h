@@ -17,7 +17,7 @@ public:
 
     void init();
     void handleInput(const InputState& state);
-    void update(float dt);
+    void update(f32 dt);
     void render();
 };
 

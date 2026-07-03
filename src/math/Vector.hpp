@@ -99,4 +99,4 @@ struct Vec2 {
 
 };
 
-typedef Vec2<float> Vec2f;
+typedef Vec2<f32> Vec2f;

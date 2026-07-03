@@ -23,11 +23,11 @@ void Game::handleInput(const InputState &state) {
     mInputSystem.handleInput(state, mEntityManager.getEntities());
 }
 
-void Game::update(const float dt) {
+void Game::update(const f32 dt) {
     mEntityManager.update();
 
-    for (auto& entity : mEntityManager.getEntities()) {
-        auto& input = entity->getComponent<CInput>();
+    for (const auto& entity : mEntityManager.getEntities()) {
+        const auto& input = entity->getComponent<CInput>();
         auto& transform = entity->getComponent<CTransform>();
 
         if (input.exists && transform.exists) {

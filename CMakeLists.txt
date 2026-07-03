@@ -24,6 +24,7 @@ add_executable(geometry_skirmishes main.cpp
         src/core/InputState.hpp
         src/systems/InputSystem.cpp
         src/systems/InputSystem.hpp
+        src/common/Types.hpp
 )
 
 target_include_directories(geometry_skirmishes PRIVATE src)

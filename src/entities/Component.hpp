@@ -15,32 +15,32 @@ struct Component {
 
 
 struct  CLifeSpan : Component {
-    int totalLifespan = 0;
-    int remainingLifespan = 0;
+    i32 totalLifespan = 0;
+    i32 remainingLifespan = 0;
 
     CLifeSpan() = default;
-    CLifeSpan(const int totalLifespan, const int remainingLifespan): totalLifespan(totalLifespan), remainingLifespan(remainingLifespan) {
+    CLifeSpan(const i32 totalLifespan, const i32 remainingLifespan): totalLifespan(totalLifespan), remainingLifespan(remainingLifespan) {
         exists = true;
     }
 };
 
 struct CPolygon : Component {
-    int vertexCount{};
-    int radius{};
+    i32 vertexCount = 0;
+    i32 radius = 0;
 
     CPolygon() = default;
-    CPolygon(const int vertexCount, const int radius) : vertexCount(vertexCount), radius(radius) {
+    CPolygon(const i32 vertexCount, const i32 radius) : vertexCount(vertexCount), radius(radius) {
         exists = true;
     }
 };
 
 struct  CTransform : Component {
-    Vec2f position{0.0f, 0.0f};
-    float rotation{0.0f};
-    Vec2f scale{1.0f, 1.0f};
+    Vec2f position = {0.0f, 0.0f};
+    f32 rotation = {0.0f};
+    Vec2f scale = {1.0f, 1.0f};
 
     CTransform() = default;
-    CTransform(const Vec2f& position, const float rotation, const Vec2f& scale):
+    CTransform(const Vec2f& position, const f32 rotation, const Vec2f& scale):
         position(position), rotation(rotation), scale(scale)
     {
         exists = true;
@@ -54,4 +54,8 @@ struct CInput : Component {
     bool right = false;
 
     CInput() = default;
+};
+
+struct CCollision : Component {
+    i32 radius = 0;
 };

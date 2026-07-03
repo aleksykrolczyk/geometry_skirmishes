@@ -6,11 +6,8 @@
 class Renderer {
 public:
     explicit Renderer(SDL_Renderer* renderer) : mRenderer(renderer) {};
-
     void drawEntities(const EntityVec& entities) const;
-
     void commit() const;
-
 
 private:
     SDL_Renderer* mRenderer;
