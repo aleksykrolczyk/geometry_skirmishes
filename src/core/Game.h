@@ -16,8 +16,9 @@ private:
     std::shared_ptr<Entity> mCursor;
 
     void sInput();
-    void sCursor() const;
-    void sMovement(f32 dt) const;
+    void sCursor();
+    void sMovement(f32 dt);
+    void sAnimation(f32 dt);
     void sSpawn();
 
 public:

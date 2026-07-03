@@ -28,6 +28,7 @@ void Game::update(const f32 dt) {
 
     sCursor();
     sInput();
+    sAnimation(dt);
     sMovement(dt);
     sSpawn();
 }
@@ -41,21 +42,10 @@ void Game::sInput() {
         input.down = mInputState.down;
         input.left = mInputState.left;
         input.right = mInputState.right;
-
-        if (auto& transform = entity->getComponent<CTransform>(); transform.exists) {
-            Vec2f direction;
-            if (input.left)  direction.x -= 1.0f;
-            if (input.right) direction.x += 1.0f;
-            if (input.up)    direction.y -= 1.0f;
-            if (input.down)  direction.y += 1.0f;
-            if (direction.x != 0.0f || direction.y != 0.0f) {
-                transform.rotation = direction.toAngle();
-            }
-        }
     }
 }
 
-void Game::sCursor() const {
+void Game::sCursor() {
     auto& transform = mCursor->getComponent<CTransform>();
     auto& polygon = mCursor->getComponent<CPolygon>();
     transform.position.x = mInputState.mouse.x;
@@ -63,7 +53,7 @@ void Game::sCursor() const {
     polygon.color = mInputState.mouse.lDown ? Color::BLUE : Color::WHITE;
 }
 
-void Game::sMovement(const f32 dt) const {
+void Game::sMovement(const f32 dt) {
     const auto& input = mPlayer->getComponent<CInput>();
     auto& transform = mPlayer->getComponent<CTransform>();
 
@@ -75,6 +65,18 @@ void Game::sMovement(const f32 dt) const {
     if (input.up)    dy -= 1;
 
     transform.position += Vec2f{dx, dy} * dt * 250.0f;
+
+}
+
+void Game::sAnimation(f32 dt) {
+    for (const auto& entity : mEntityManager.getEntities()) {
+        auto& transform = entity->getComponent<CTransform>();
+        if (!transform.exists) continue;
+        transform.rotation += std::numbers::pi / 2 * dt;
+        if (transform.rotation > 2 * std::numbers::pi) {
+            transform.rotation -= 2 * std::numbers::pi;
+        }
+    }
 }
 
 void Game::sSpawn() {
