@@ -6,17 +6,17 @@
 
 void Game::init() {
     const auto s1 = mEntityManager.addEntity(EntityTag::Neutral);
-    s1->addComponent<CPolygon>(4, 30);
+    s1->addComponent<CPolygon>(30, 30, Color::RED);
     s1->addComponent<CTransform>(Vec2f{100, 100}, 0, Vec2f{1});
 
     const auto s2 = mEntityManager.addEntity(EntityTag::Neutral);
-    s2->addComponent<CPolygon>(10, 100);
+    s2->addComponent<CPolygon>(4, 100, Color::RED);
     s2->addComponent<CTransform>(Vec2f{500, 100}, 0, Vec2f{1});
 
-    const auto s3 = mEntityManager.addEntity(EntityTag::Player);
-    s3->addComponent<CPolygon>(3, 30);
-    s3->addComponent<CTransform>(Vec2f{300, 500}, 0, Vec2f{2, 1});
-    s3->addComponent<CInput>();
+    const auto player = mEntityManager.addEntity(EntityTag::Player);
+    player->addComponent<CPolygon>(8, 30, Color::GREEN);
+    player->addComponent<CTransform>(Vec2f{300, 500}, 0, Vec2f{1});
+    player->addComponent<CInput>();
 }
 
 void Game::handleInput(const InputState &state) {

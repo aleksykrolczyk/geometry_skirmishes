@@ -16,9 +16,9 @@ void Renderer::drawPolygon(const CPolygon& polygon, const CTransform& transform)
     std::vector<SDL_FPoint> vertices;
     vertices.reserve(polygon.vertexCount);
 
-    const float step = 2.0f * std::numbers::pi_v<float> / polygon.vertexCount;
-    for (int i = 0; i < polygon.vertexCount; i++) {
-        const float angle = i * step;
+    const f32 step = 2.0f * std::numbers::pi_v<f32> / polygon.vertexCount;
+    for (u32 i = 0; i < polygon.vertexCount; i++) {
+        const f32 angle = i * step;
 
         const Vec2f local {
             polygon.radius * std::cos(angle),
@@ -35,7 +35,8 @@ void Renderer::drawPolygon(const CPolygon& polygon, const CTransform& transform)
     vertices.push_back(vertices[0]);
 
 
-    SDL_SetRenderDrawColor(mRenderer, 255, 0, 0, 255);
+    const auto& [r, g, b, a] = polygon.color;
+    SDL_SetRenderDrawColor(mRenderer, r, g, b, a);
     SDL_RenderLines(mRenderer, vertices.data(), vertices.size());
 }
 

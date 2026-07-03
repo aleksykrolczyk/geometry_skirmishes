@@ -1,4 +1,5 @@
 #pragma once
+#include "../common/Color.hpp"
 #include "math/Vector.hpp"
 
 struct Component {
@@ -27,9 +28,10 @@ struct  CLifeSpan : Component {
 struct CPolygon : Component {
     i32 vertexCount = 0;
     i32 radius = 0;
+    Color color = {};
 
     CPolygon() = default;
-    CPolygon(const i32 vertexCount, const i32 radius) : vertexCount(vertexCount), radius(radius) {
+    CPolygon(const i32 vertexCount, const i32 radius, const Color& color) : vertexCount(vertexCount), radius(radius), color(color) {
         exists = true;
     }
 };
