@@ -43,11 +43,20 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
         const bool pressed = (event->type == SDL_EVENT_KEY_DOWN);
 
         switch (event->key.key) {
-            case SDLK_UP: state->input.up = pressed; break;
-            case SDLK_DOWN: state->input.down = pressed; break;
-            case SDLK_LEFT: state->input.left = pressed; break;
-            case SDLK_RIGHT: state->input.right = pressed; break;
+            case SDLK_W: state->input.up = pressed; break;
+            case SDLK_S: state->input.down = pressed; break;
+            case SDLK_A: state->input.left = pressed; break;
+            case SDLK_D: state->input.right = pressed; break;
             case SDLK_ESCAPE: state->input.quit = pressed; break;
+            default: ;
+        }
+    }
+
+    if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN || event->type == SDL_EVENT_MOUSE_BUTTON_UP) {
+        const bool pressed = (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN);
+        switch (event->button.button) {
+            case SDL_BUTTON_LEFT: state->input.mouse.lDown = pressed; break;
+            case SDL_BUTTON_RIGHT: state->input.mouse.rDown = pressed; break;
             default: ;
         }
     }
@@ -64,6 +73,8 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     const Uint64 freq = SDL_GetPerformanceFrequency();
 
     auto dt = static_cast<float>(now - state->last_time) / static_cast<float>(freq);
+
+    SDL_GetMouseState(&state->input.mouse.x, &state->input.mouse.y);
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);

@@ -25,6 +25,10 @@ EntityVec &EntityManager::getEntities(const EntityTag &tag) {
     return mEntitiesMap[tag];
 }
 
+std::shared_ptr<Entity> EntityManager::getFirst(const EntityTag &tag) {
+    return getEntities(tag)[0];
+}
+
 std::shared_ptr<Entity> EntityManager::addEntity(const EntityTag tag) {
     auto e = std::shared_ptr<Entity>(new Entity(tag, mTotalEntities++));
     mToAdd.push_back(e);

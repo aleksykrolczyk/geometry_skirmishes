@@ -20,6 +20,7 @@ public:
     void update();
     EntityVec& getEntities();
     EntityVec& getEntities(const EntityTag& tag);
+    std::shared_ptr<Entity> getFirst(const EntityTag& tag);
     std::shared_ptr<Entity> addEntity(EntityTag tag);
 };
 

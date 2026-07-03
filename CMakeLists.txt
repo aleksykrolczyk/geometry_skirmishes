@@ -22,8 +22,6 @@ add_executable(geometry_skirmishes main.cpp
         src/systems/Renderer.cpp
         src/systems/Renderer.hpp
         src/core/InputState.hpp
-        src/systems/InputSystem.cpp
-        src/systems/InputSystem.hpp
         src/common/Types.hpp
         src/common/Color.cpp
         src/common/Color.hpp

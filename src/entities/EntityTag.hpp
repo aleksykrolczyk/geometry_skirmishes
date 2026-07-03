@@ -2,6 +2,7 @@
 
 enum class EntityTag {
     Player,
+    Cursor,
     Enemy,
     Neutral,
 };
