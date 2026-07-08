@@ -22,26 +22,28 @@ void Game::init() {
     mCursor->addComponent<CTransform>(Vec2f{-1, -1}, 0, Vec2f{1});
 }
 
-void Game::handleInput(const InputState &state) {
-
+void Game::handleInput(const InputState &state) const {
     auto &input = mPlayer->getComponent<CInput>();
-    input.up = state.up;
-    input.down = state.down;
-    input.left = state.left;
-    input.right = state.right;
+    input.up = state.up.down();
+    input.down = state.down.down();
+    input.left = state.left.down();
+    input.right = state.right.down();
 
+    input.shoot = state.mouse.left.pressed();
+    input.mousePosition = {state.mouse.x, state.mouse.y};
 
     auto& transform = mCursor->getComponent<CTransform>();
     auto& polygon = mCursor->getComponent<CPolygon>();
     transform.position.x = state.mouse.x;
     transform.position.y = state.mouse.y;
-    polygon.color = state.mouse.lDown ? Color::BLUE : Color::WHITE;
+    polygon.color = state.mouse.left.down() ? Color::BLUE : Color::WHITE;
 }
 
 void Game::update(const f32 dt) {
     mEntityManager.update();
     sControl();
-    sPhysics(dt);
+    sMovement(dt);
+    sSpawn();
     sAnimation(dt);
 }
 
@@ -55,10 +57,10 @@ void Game::sControl() const {
     if (input.up) direction.y -= 1;
     if (input.down) direction.y += 1;
 
-    velocity.velocity = direction.isZero() ? Vec2f{0, 0} : direction.normalized() * mPlayerSpeed;
+    velocity.velocity = direction.isZero() ? Vec2f{0, 0} : direction.normalized() * mConfig.playerSpeed;
 }
 
-void Game::sPhysics(const f32 dt) {
+void Game::sMovement(const f32 dt) {
     for (const auto& entity : mEntityManager.getEntities()) {
         auto& transform = entity->getComponent<CTransform>();
         auto& velocity = entity->getComponent<CVelocity>();
@@ -71,11 +73,24 @@ void Game::sPhysics(const f32 dt) {
             if (entity == other) continue;
 
             if (Physics::isCollision(*entity, *other)) {
-                transform.position -= delta;
-                velocity.velocity = {0,0};
-                break;
+                switch (entity->getTag()) {
+                    case EntityTag::Player:
+                        transform.position -= delta;
+                        velocity.velocity = {0,0};
+                        break;
+                    case EntityTag::Bullet:
+                        entity->destroy();
+                    default: ;
+                }
             }
         }
+    }
+}
+
+void Game::sSpawn() {
+    const auto input = mPlayer->getComponent<CInput>();
+    if (input.shoot) {
+        spawnBullet(mPlayer->getComponent<CTransform>().position, input.mousePosition);
     }
 }
 
@@ -91,8 +106,16 @@ void Game::sAnimation(const f32 dt) {
 }
 
 
-void Game::spawnBullet() {
+void Game::spawnBullet(const Vec2f& from, const Vec2f& to) {
+    const auto bullet = mEntityManager.addEntity(EntityTag::Bullet);
+    const auto playerRadius = mPlayer->getComponent<CPolygon>().radius;
+    const auto direction = (to - from).normalized();
 
+    const auto spawnPosition = from + direction * ((playerRadius + mConfig.bulletRadius) * 1.05);
+    bullet->addComponent<CPolygon>(10, mConfig.bulletRadius, Color::RED);
+    bullet->addComponent<CCollision>(mConfig.bulletRadius);
+    bullet->addComponent<CTransform>(spawnPosition, 0, Vec2f{1});
+    bullet->addComponent<CVelocity>(direction * mConfig.bulletSpeed);
 }
 
 void Game::render() {

@@ -35,7 +35,6 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
     auto *state = static_cast<AppState *>(appstate);
 
     if (event->type == SDL_EVENT_QUIT) {
-        state->input.quit = true;
         return SDL_APP_SUCCESS;
     }
 
@@ -43,11 +42,10 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
         const bool pressed = (event->type == SDL_EVENT_KEY_DOWN);
 
         switch (event->key.key) {
-            case SDLK_W: state->input.up = pressed; break;
-            case SDLK_S: state->input.down = pressed; break;
-            case SDLK_A: state->input.left = pressed; break;
-            case SDLK_D: state->input.right = pressed; break;
-            case SDLK_ESCAPE: state->input.quit = pressed; break;
+            case SDLK_W: state->input.up.current = pressed; break;
+            case SDLK_S: state->input.down.current = pressed; break;
+            case SDLK_A: state->input.left.current = pressed; break;
+            case SDLK_D: state->input.right.current = pressed; break;
             default: ;
         }
     }
@@ -55,8 +53,8 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
     if (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN || event->type == SDL_EVENT_MOUSE_BUTTON_UP) {
         const bool pressed = (event->type == SDL_EVENT_MOUSE_BUTTON_DOWN);
         switch (event->button.button) {
-            case SDL_BUTTON_LEFT: state->input.mouse.lDown = pressed; break;
-            case SDL_BUTTON_RIGHT: state->input.mouse.rDown = pressed; break;
+            case SDL_BUTTON_LEFT: state->input.mouse.left.current = pressed; break;
+            case SDL_BUTTON_RIGHT: state->input.mouse.left.current = pressed; break;
             default: ;
         }
     }
@@ -83,6 +81,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
     game->update(dt);
     game->render();
 
+    state->input.endFrame();
     state->last_time = now;
 
     return SDL_APP_CONTINUE;

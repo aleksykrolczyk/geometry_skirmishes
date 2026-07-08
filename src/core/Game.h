@@ -8,26 +8,33 @@
 
 class Game {
 private:
-    f32 mPlayerSpeed = 250;
+    struct GameConfig {
+        f32 playerSpeed = 250;
+        f32 bulletSpeed = 500;
+        f32 bulletRadius = 5;
+    };
+
+    GameConfig mConfig;
 
     EntityManager mEntityManager;
     Renderer mRenderer;
-    InputState mInputState;
 
     std::shared_ptr<Entity> mPlayer;
     std::shared_ptr<Entity> mCursor;
 
     void sControl() const;
-    void sPhysics(f32 dt);
+    void sMovement(f32 dt);
+    void sSpawn();
     void sAnimation(f32 dt);
 
-    void spawnBullet();
+    void spawnBullet(const Vec2f &from, const Vec2f &to);
 
 public:
     explicit Game(SDL_Renderer* render): mRenderer(render) {};
 
     void init();
-    void handleInput(const InputState& state);
+    void handleInput(const InputState& state) const;
+
     void update(f32 dt);
 
     void render();

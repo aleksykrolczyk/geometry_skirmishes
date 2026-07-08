@@ -5,6 +5,7 @@ enum class EntityTag {
     Cursor,
     Enemy,
     Neutral,
+    Bullet,
 };
 
 

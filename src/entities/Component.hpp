@@ -55,6 +55,9 @@ struct CInput : Component {
     bool left = false;
     bool right = false;
 
+    bool shoot = false;
+    Vec2f mousePosition;
+
     CInput() = default;
 };
 
