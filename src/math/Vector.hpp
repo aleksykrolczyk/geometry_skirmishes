@@ -63,8 +63,11 @@ struct Vec2 {
     }
 
     Vec2 normalized() {
-        auto f = length();
-        return {x / f, y / f};
+        auto len = length();
+        if (len < 1e-6f) {
+            return Vec2(0, 0);
+        }
+        return {x / len, y / len};
     }
 
     Vec2 rotated(const float angle) const {

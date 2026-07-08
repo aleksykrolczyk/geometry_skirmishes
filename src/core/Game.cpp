@@ -1,6 +1,5 @@
 #include "Game.h"
 
-#include "../entities/Component.hpp"
 #include "math/Vector.hpp"
 
 
@@ -64,7 +63,10 @@ void Game::sMovement(const f32 dt) {
     if (input.down)  dy += 1;
     if (input.up)    dy -= 1;
 
-    transform.position += Vec2f{dx, dy} * dt * 250.0f;
+    auto v = Vec2f{dx, dy};
+    constexpr auto speed = 250.0f;
+
+    transform.position += v.normalized() * speed * dt;
 
 }
 
