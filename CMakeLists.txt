@@ -25,6 +25,7 @@ add_executable(geometry_skirmishes main.cpp
         src/common/Types.hpp
         src/common/Color.cpp
         src/common/Color.hpp
+        src/core/Physics.hpp
 )
 
 target_include_directories(geometry_skirmishes PRIVATE src)

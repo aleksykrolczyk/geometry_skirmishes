@@ -1,15 +1,19 @@
 #include "Game.h"
 
+#include "Physics.hpp"
 #include "math/Vector.hpp"
 
 
 void Game::init() {
     const auto s1 = mEntityManager.addEntity(EntityTag::Neutral);
     s1->addComponent<CPolygon>(4, 30, Color::RED);
+    s1->addComponent<CCollision>(30);
     s1->addComponent<CTransform>(Vec2f{100, 100}, 0, Vec2f{1});
 
     mPlayer = mEntityManager.addEntity(EntityTag::Player);
-    mPlayer->addComponent<CPolygon>(8, 30, Color::GREEN);
+    mPlayer->addComponent<CPolygon>(8, 20, Color::GREEN);
+    mPlayer->addComponent<CCollision>(20);
+    mPlayer->addComponent<CVelocity>(Vec2f{0, 0});
     mPlayer->addComponent<CTransform>(Vec2f{300, 500}, 0, Vec2f{1});
     mPlayer->addComponent<CInput>();
 
@@ -19,58 +23,63 @@ void Game::init() {
 }
 
 void Game::handleInput(const InputState &state) {
-    mInputState = state;
+
+    auto &input = mPlayer->getComponent<CInput>();
+    input.up = state.up;
+    input.down = state.down;
+    input.left = state.left;
+    input.right = state.right;
+
+
+    auto& transform = mCursor->getComponent<CTransform>();
+    auto& polygon = mCursor->getComponent<CPolygon>();
+    transform.position.x = state.mouse.x;
+    transform.position.y = state.mouse.y;
+    polygon.color = state.mouse.lDown ? Color::BLUE : Color::WHITE;
 }
 
 void Game::update(const f32 dt) {
     mEntityManager.update();
-
-    sCursor();
-    sInput();
+    sControl();
+    sPhysics(dt);
     sAnimation(dt);
-    sMovement(dt);
-    sSpawn();
 }
 
-void Game::sInput() {
-    for (const auto& entity : mEntityManager.getEntities()) {
-        auto& input = entity->getComponent<CInput>();
-        if (!input.exists) continue;
+void Game::sControl() const {
+    auto& input = mPlayer->getComponent<CInput>();
+    auto& velocity = mPlayer->getComponent<CVelocity>();
+    Vec2f direction{0,0};
 
-        input.up = mInputState.up;
-        input.down = mInputState.down;
-        input.left = mInputState.left;
-        input.right = mInputState.right;
+    if (input.left) direction.x -= 1;
+    if (input.right) direction.x += 1;
+    if (input.up) direction.y -= 1;
+    if (input.down) direction.y += 1;
+
+    velocity.velocity = direction.isZero() ? Vec2f{0, 0} : direction.normalized() * mPlayerSpeed;
+}
+
+void Game::sPhysics(const f32 dt) {
+    for (const auto& entity : mEntityManager.getEntities()) {
+        auto& transform = entity->getComponent<CTransform>();
+        auto& velocity = entity->getComponent<CVelocity>();
+
+        if (!transform.exists || !velocity.exists) continue;
+
+        const Vec2f delta = velocity.velocity * dt;
+        transform.position += delta;
+        for (const auto& other : mEntityManager.getEntities()) {
+            if (entity == other) continue;
+
+            if (Physics::isCollision(*entity, *other)) {
+                transform.position -= delta;
+                velocity.velocity = {0,0};
+                break;
+            }
+        }
     }
 }
 
-void Game::sCursor() {
-    auto& transform = mCursor->getComponent<CTransform>();
-    auto& polygon = mCursor->getComponent<CPolygon>();
-    transform.position.x = mInputState.mouse.x;
-    transform.position.y = mInputState.mouse.y;
-    polygon.color = mInputState.mouse.lDown ? Color::BLUE : Color::WHITE;
-}
-
-void Game::sMovement(const f32 dt) {
-    const auto& input = mPlayer->getComponent<CInput>();
-    auto& transform = mPlayer->getComponent<CTransform>();
-
-    auto dx = 0.0f, dy = 0.0f;
-
-    if (input.left)  dx -= 1;
-    if (input.right) dx += 1;
-    if (input.down)  dy += 1;
-    if (input.up)    dy -= 1;
-
-    auto v = Vec2f{dx, dy};
-    constexpr auto speed = 250.0f;
-
-    transform.position += v.normalized() * speed * dt;
-
-}
-
-void Game::sAnimation(f32 dt) {
+void Game::sAnimation(const f32 dt) {
     for (const auto& entity : mEntityManager.getEntities()) {
         auto& transform = entity->getComponent<CTransform>();
         if (!transform.exists) continue;
@@ -81,8 +90,9 @@ void Game::sAnimation(f32 dt) {
     }
 }
 
-void Game::sSpawn() {
-    // TODO
+
+void Game::spawnBullet() {
+
 }
 
 void Game::render() {

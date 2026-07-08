@@ -60,4 +60,17 @@ struct CInput : Component {
 
 struct CCollision : Component {
     i32 radius = 0;
+
+    CCollision() = default;
+    explicit CCollision(const i32 radius): radius(radius) {
+        exists = true;
+    };
+};
+
+struct CVelocity : Component {
+    Vec2f velocity = {0.0f, 0.0f};
+    CVelocity() = default;
+    explicit CVelocity(const Vec2f velocity): velocity(velocity) {
+        exists = true;
+    };
 };

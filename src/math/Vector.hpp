@@ -1,6 +1,8 @@
 #pragma once
 #include <cmath>
 
+constexpr f32 EPSILON = 1e-6f;
+
 template <typename T>
 struct Vec2 {
 
@@ -64,7 +66,7 @@ struct Vec2 {
 
     Vec2 normalized() {
         auto len = length();
-        if (len < 1e-6f) {
+        if (len < EPSILON) {
             return Vec2(0, 0);
         }
         return {x / len, y / len};
@@ -99,6 +101,10 @@ struct Vec2 {
         return std::atan2(y, x);
     }
 
+    [[nodiscard]]
+    bool isZero() const {
+        return std::abs(x) < EPSILON && std::abs(y) < EPSILON;
+    }
 
 };
 

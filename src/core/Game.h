@@ -8,6 +8,8 @@
 
 class Game {
 private:
+    f32 mPlayerSpeed = 250;
+
     EntityManager mEntityManager;
     Renderer mRenderer;
     InputState mInputState;
@@ -15,11 +17,11 @@ private:
     std::shared_ptr<Entity> mPlayer;
     std::shared_ptr<Entity> mCursor;
 
-    void sInput();
-    void sCursor();
-    void sMovement(f32 dt);
+    void sControl() const;
+    void sPhysics(f32 dt);
     void sAnimation(f32 dt);
-    void sSpawn();
+
+    void spawnBullet();
 
 public:
     explicit Game(SDL_Renderer* render): mRenderer(render) {};

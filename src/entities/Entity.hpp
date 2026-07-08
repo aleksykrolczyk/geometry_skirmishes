@@ -7,10 +7,12 @@
 
 
 using ComponentTuple = std::tuple<
-    CTransform,
     CLifeSpan,
     CPolygon,
-    CInput
+    CTransform,
+    CInput,
+    CCollision,
+    CVelocity
 >;
 
 class Entity {
@@ -39,6 +41,10 @@ public:
 
     void destroy() {
         mIsAlive = false;
+    }
+
+    bool operator==(const Entity& other) const {
+        return mId == other.mId;
     }
 
     template<typename T, typename... TArgs>
