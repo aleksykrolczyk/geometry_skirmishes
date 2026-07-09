@@ -2,15 +2,10 @@
 
 #include "Physics.hpp"
 #include "math/Vector.hpp"
-#include "random/Random.hpp"
+#include "../common/Random.hpp"
 
 
 void Game::init() {
-    const auto s1 = mEntityManager.addEntity(EntityTag::Neutral);
-    s1->addComponent<CPolygon>(4, 30, Color::RED);
-    s1->addComponent<CCollision>(30);
-    s1->addComponent<CTransform>(Vec2f{250, 250}, 0, Vec2f{1});
-
     mPlayer = mEntityManager.addEntity(EntityTag::Player);
     mPlayer->addComponent<CPolygon>(8, mConfig.playerRadius, Color::GREEN);
     mPlayer->addComponent<CCollision>(mConfig.playerRadius);
@@ -100,15 +95,36 @@ void Game::sEnemySpawn(const f32 dt) {
     if (mEnemyTimer < mConfig.enemySpawnDelay) {
         return;
     }
-    const Vec2f pos = {Random::getFloat(0, mWorld.size.x), Random::getFloat(0, mWorld.size.y)};
+
     const i32 verticesCount = Random::getInt(3, mConfig.enemyMaxVertices);
     const f32 radius = Random::getFloat(mConfig.enemyRadiusLimits.first, mConfig.enemyRadiusLimits.second);
-    const Vec2f v = (Vec2f{Random::getFloat(), Random::getFloat()} - Vec2f{0.5, 0.5}) * 2;
+
+    Vec2f pos;
+    const auto posOffset = 2 * radius;
+
+    switch (Random::getInt(0, 3)) {
+        case 0: // top
+            pos = {Random::getFloat(0, mWorld.size.x), -posOffset};
+            break;
+        case 1: // left
+            pos = {-posOffset, Random::getFloat(0, mWorld.size.y)};
+            break;
+        case 2: // bottom
+            pos = {Random::getFloat(0, mWorld.size.x), mWorld.size.y + posOffset};
+            break;
+        case 3: //right
+            pos = {mWorld.size.x + posOffset, Random::getFloat(0, mWorld.size.y)};
+            break;
+        default: break;
+    }
+
     const auto speed = Random::getFloat(mConfig.enemySpeedLimits.first, mConfig.enemySpeedLimits.second);
-    spawnEnemy(pos, verticesCount, radius, v.normalized() * speed);
+    const Vec2f target{Random::getFloat(0, mWorld.size.x), Random::getFloat(0, mWorld.size.y)};
+    const Vec2f velocity = (target - pos).normalized() * speed;
+
+    spawnEnemy(pos, verticesCount, radius, velocity);
     mEnemyTimer -= mConfig.enemySpawnDelay;
 }
-
 
 void Game::sAnimation(const f32 dt) {
     for (const auto& entity : mEntityManager.getEntities()) {
@@ -128,7 +144,7 @@ void Game::spawnBullet(const Vec2f& from, const Vec2f& to) {
     const auto direction = (to - from).normalized();
 
     const auto spawnPosition = from + direction * ((playerRadius + mConfig.bulletRadius) * 1.05);
-    bullet->addComponent<CPolygon>(10, mConfig.bulletRadius, Color::RED);
+    bullet->addComponent<CPolygon>(10, mConfig.bulletRadius, Color::WHITE);
     bullet->addComponent<CCollision>(mConfig.bulletRadius);
     bullet->addComponent<CTransform>(spawnPosition, 0, Vec2f{1});
     bullet->addComponent<CVelocity>(direction * mConfig.bulletSpeed);

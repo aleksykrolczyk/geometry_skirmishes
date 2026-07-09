@@ -3,7 +3,7 @@
 #include "EntityManager.hpp"
 #include "InputState.hpp"
 #include "SDL3/SDL_render.h"
-#include "systems/Renderer.hpp"
+#include "Renderer.hpp"
 
 struct GameConfig {
     f32 playerSpeed = 500;
@@ -11,8 +11,8 @@ struct GameConfig {
     f32 bulletSpeed = 750;
     f32 bulletRadius = 5;
 
-    f32 enemySpawnDelay = 1;
-    std::pair<f32, f32> enemyRadiusLimits = {20, 100};
+    f32 enemySpawnDelay = 0.5;
+    std::pair<f32, f32> enemyRadiusLimits = {10, 100};
     std::pair<f32, f32> enemySpeedLimits = {100, 500};
 
     i32 enemyMaxVertices = 8;
