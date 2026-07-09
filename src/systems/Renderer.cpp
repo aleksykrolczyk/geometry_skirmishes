@@ -4,6 +4,14 @@
 
 #include "core/EntityManager.hpp"
 
+Renderer::Renderer(SDL_Window *window, SDL_Renderer *renderer, const Vec2f worldSize):
+    mWindow(window), mRenderer(renderer), mWorldSize(worldSize)
+{
+    i32 w, h;
+    SDL_GetWindowSize(mWindow, &w, &h);
+    mScreenSize = {static_cast<float>(w), static_cast<float>(h)};
+}
+
 void Renderer::drawEntities(const EntityVec &entities) const {
     for (const auto& e : entities) {
         if (e->hasComponent<CPolygon>() && e->hasComponent<CTransform>()) {
@@ -30,7 +38,8 @@ void Renderer::drawPolygon(const CPolygon& polygon, const CTransform& transform)
             .rotated(transform.rotation)
             .translated(transform.position);
 
-        vertices.push_back(SDL_FPoint{transformed.x, transformed.y});
+        const auto screen = worldToScreen(transformed);
+        vertices.push_back(SDL_FPoint{screen.x, screen.y});
     }
     vertices.push_back(vertices[0]);
 
@@ -42,5 +51,30 @@ void Renderer::drawPolygon(const CPolygon& polygon, const CTransform& transform)
 
 void Renderer::commit() const {
     SDL_RenderPresent(mRenderer);
+}
+
+Vec2f Renderer::screenToWorld(const Vec2f& screen) const {
+    const float scale = std::min(
+        mScreenSize.x / mWorldSize.x,
+        mScreenSize.y / mWorldSize.y
+    );
+
+    const float offsetX = (mScreenSize.x - mWorldSize.x * scale) * 0.5f;
+    const float offsetY = (mScreenSize.y - mWorldSize.y * scale) * 0.5f;
+
+    return {
+        (screen.x - offsetX) / scale,
+        (screen.y - offsetY) / scale
+    };
+}
+
+Vec2f Renderer::worldToScreen(const Vec2f &world) const {
+    const f32 scale = std::min(mScreenSize.x / mWorldSize.x, mScreenSize.y / mWorldSize.y);
+    const float offsetX = (mScreenSize.x - mWorldSize.x * scale) * 0.5f;
+    const float offsetY = (mScreenSize.y - mWorldSize.y * scale) * 0.5f;
+    return {
+        offsetX + world.x * scale,
+        offsetY + world.y * scale
+    };
 }
 

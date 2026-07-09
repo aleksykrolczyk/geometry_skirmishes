@@ -8,13 +8,13 @@ void Game::init() {
     const auto s1 = mEntityManager.addEntity(EntityTag::Neutral);
     s1->addComponent<CPolygon>(4, 30, Color::RED);
     s1->addComponent<CCollision>(30);
-    s1->addComponent<CTransform>(Vec2f{100, 100}, 0, Vec2f{1});
+    s1->addComponent<CTransform>(Vec2f{250, 250}, 0, Vec2f{1});
 
     mPlayer = mEntityManager.addEntity(EntityTag::Player);
-    mPlayer->addComponent<CPolygon>(8, 20, Color::GREEN);
-    mPlayer->addComponent<CCollision>(20);
+    mPlayer->addComponent<CPolygon>(8, mConfig.playerRadius, Color::GREEN);
+    mPlayer->addComponent<CCollision>(mConfig.playerRadius);
     mPlayer->addComponent<CVelocity>(Vec2f{0, 0});
-    mPlayer->addComponent<CTransform>(Vec2f{300, 500}, 0, Vec2f{1});
+    mPlayer->addComponent<CTransform>(mWorld.size / 2, 0, Vec2f{1});
     mPlayer->addComponent<CInput>();
 
     mCursor = mEntityManager.addEntity(EntityTag::Cursor);
@@ -30,12 +30,11 @@ void Game::handleInput(const InputState &state) const {
     input.right = state.right.down();
 
     input.shoot = state.mouse.left.pressed();
-    input.mousePosition = {state.mouse.x, state.mouse.y};
+    input.mousePosition = mRenderer.screenToWorld({state.mouse.x, state.mouse.y});
 
     auto& transform = mCursor->getComponent<CTransform>();
     auto& polygon = mCursor->getComponent<CPolygon>();
-    transform.position.x = state.mouse.x;
-    transform.position.y = state.mouse.y;
+    transform.position = input.mousePosition;
     polygon.color = state.mouse.left.down() ? Color::BLUE : Color::WHITE;
 }
 
@@ -48,7 +47,7 @@ void Game::update(const f32 dt) {
 }
 
 void Game::sControl() const {
-    auto& input = mPlayer->getComponent<CInput>();
+    const auto& input = mPlayer->getComponent<CInput>();
     auto& velocity = mPlayer->getComponent<CVelocity>();
     Vec2f direction{0,0};
 
@@ -88,7 +87,7 @@ void Game::sMovement(const f32 dt) {
 }
 
 void Game::sSpawn() {
-    const auto input = mPlayer->getComponent<CInput>();
+    const auto& input = mPlayer->getComponent<CInput>();
     if (input.shoot) {
         spawnBullet(mPlayer->getComponent<CTransform>().position, input.mousePosition);
     }

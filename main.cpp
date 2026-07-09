@@ -22,7 +22,7 @@ SDL_AppResult SDL_AppInit(void **appstate, int argc, char *argv[]) {
     }
 
     auto *state = new AppState();
-    state->game = new Game(renderer);
+    state->game = new Game(window, renderer);
     state->last_time = SDL_GetPerformanceCounter();
     *appstate = state;
 

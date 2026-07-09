@@ -5,16 +5,21 @@
 #include "SDL3/SDL_render.h"
 #include "systems/Renderer.hpp"
 
+struct GameConfig {
+    f32 playerSpeed = 500;
+    f32 playerRadius = 20;
+    f32 bulletSpeed = 750;
+    f32 bulletRadius = 5;
+};
+
+struct World {
+    Vec2f size = {1600, 900};
+};
 
 class Game {
 private:
-    struct GameConfig {
-        f32 playerSpeed = 250;
-        f32 bulletSpeed = 500;
-        f32 bulletRadius = 5;
-    };
-
     GameConfig mConfig;
+    World mWorld;
 
     EntityManager mEntityManager;
     Renderer mRenderer;
@@ -30,7 +35,7 @@ private:
     void spawnBullet(const Vec2f &from, const Vec2f &to);
 
 public:
-    explicit Game(SDL_Renderer* render): mRenderer(render) {};
+    explicit Game(SDL_Window* window, SDL_Renderer* render): mRenderer(window, render, mWorld.size) {};
 
     void init();
     void handleInput(const InputState& state) const;

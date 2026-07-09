@@ -5,11 +5,22 @@
 
 class Renderer {
 public:
-    explicit Renderer(SDL_Renderer* renderer) : mRenderer(renderer) {};
+    explicit Renderer(SDL_Window* window, SDL_Renderer* renderer, const Vec2f worldSize);
+
     void drawEntities(const EntityVec& entities) const;
     void commit() const;
 
+    [[nodiscard]]
+    Vec2f screenToWorld(const Vec2f &screen) const;
+
+    [[nodiscard]]
+    Vec2f worldToScreen(const Vec2f &world) const;
+
 private:
+    SDL_Window* mWindow;
     SDL_Renderer* mRenderer;
+    Vec2f mWorldSize;
+    Vec2f mScreenSize;
+
     void drawPolygon(const CPolygon &polygon, const CTransform &transform) const;
 };
