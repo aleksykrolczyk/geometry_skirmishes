@@ -2,6 +2,7 @@
 
 #include "Physics.hpp"
 #include "math/Vector.hpp"
+#include "random/Random.hpp"
 
 
 void Game::init() {
@@ -42,7 +43,8 @@ void Game::update(const f32 dt) {
     mEntityManager.update();
     sControl();
     sMovement(dt);
-    sSpawn();
+    sPlayerActions();
+    sEnemySpawn(dt);
     sAnimation(dt);
 }
 
@@ -86,12 +88,27 @@ void Game::sMovement(const f32 dt) {
     }
 }
 
-void Game::sSpawn() {
+void Game::sPlayerActions() {
     const auto& input = mPlayer->getComponent<CInput>();
     if (input.shoot) {
         spawnBullet(mPlayer->getComponent<CTransform>().position, input.mousePosition);
     }
 }
+
+void Game::sEnemySpawn(const f32 dt) {
+    mEnemyTimer += dt;
+    if (mEnemyTimer < mConfig.enemySpawnDelay) {
+        return;
+    }
+    const Vec2f pos = {Random::getFloat(0, mWorld.size.x), Random::getFloat(0, mWorld.size.y)};
+    const i32 verticesCount = Random::getInt(3, mConfig.enemyMaxVertices);
+    const f32 radius = Random::getFloat(mConfig.enemyRadiusLimits.first, mConfig.enemyRadiusLimits.second);
+    const Vec2f v = (Vec2f{Random::getFloat(), Random::getFloat()} - Vec2f{0.5, 0.5}) * 2;
+    const auto speed = Random::getFloat(mConfig.enemySpeedLimits.first, mConfig.enemySpeedLimits.second);
+    spawnEnemy(pos, verticesCount, radius, v.normalized() * speed);
+    mEnemyTimer -= mConfig.enemySpawnDelay;
+}
+
 
 void Game::sAnimation(const f32 dt) {
     for (const auto& entity : mEntityManager.getEntities()) {
@@ -115,6 +132,14 @@ void Game::spawnBullet(const Vec2f& from, const Vec2f& to) {
     bullet->addComponent<CCollision>(mConfig.bulletRadius);
     bullet->addComponent<CTransform>(spawnPosition, 0, Vec2f{1});
     bullet->addComponent<CVelocity>(direction * mConfig.bulletSpeed);
+}
+
+void Game::spawnEnemy(const Vec2f &at, i32 vertices, f32 radius, Vec2f velocity) {
+    const auto enemy = mEntityManager.addEntity(EntityTag::Enemy);
+    enemy->addComponent<CPolygon>(vertices, radius, Color::RED);
+    enemy->addComponent<CCollision>(radius);
+    enemy->addComponent<CTransform>(at, 0, Vec2f{1});
+    enemy->addComponent<CVelocity>(velocity);
 }
 
 void Game::render() {

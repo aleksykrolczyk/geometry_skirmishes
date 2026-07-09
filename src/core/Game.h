@@ -10,6 +10,13 @@ struct GameConfig {
     f32 playerRadius = 20;
     f32 bulletSpeed = 750;
     f32 bulletRadius = 5;
+
+    f32 enemySpawnDelay = 1;
+    std::pair<f32, f32> enemyRadiusLimits = {20, 100};
+    std::pair<f32, f32> enemySpeedLimits = {100, 500};
+
+    i32 enemyMaxVertices = 8;
+
 };
 
 struct World {
@@ -27,12 +34,16 @@ private:
     std::shared_ptr<Entity> mPlayer;
     std::shared_ptr<Entity> mCursor;
 
+    f32 mEnemyTimer = 0;
+
     void sControl() const;
     void sMovement(f32 dt);
-    void sSpawn();
+    void sPlayerActions();
+    void sEnemySpawn(f32 dt);
     void sAnimation(f32 dt);
 
     void spawnBullet(const Vec2f &from, const Vec2f &to);
+    void spawnEnemy(const Vec2f &at, i32 vertices, f32 radius, Vec2f velocity);
 
 public:
     explicit Game(SDL_Window* window, SDL_Renderer* render): mRenderer(window, render, mWorld.size) {};

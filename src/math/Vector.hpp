@@ -56,7 +56,7 @@ struct Vec2 {
         return x == rhs.x && y == rhs.y;
     }
 
-    T length() {
+    T length() const {
         return sqrtf(x * x + y * y);
     }
 
@@ -64,7 +64,7 @@ struct Vec2 {
         return (rhs - *this).length();
     }
 
-    Vec2 normalized() {
+    Vec2 normalized() const {
         auto len = length();
         if (len < EPSILON) {
             return Vec2(0, 0);

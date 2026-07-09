@@ -18,7 +18,7 @@ add_executable(geometry_skirmishes main.cpp
         src/core/EntityManager.hpp
         src/entities/EntityTag.hpp
         src/entities/Component.hpp
-        src/random/RandomGenerator.cpp
+        src/random/Random.hpp
         src/systems/Renderer.cpp
         src/systems/Renderer.hpp
         src/core/InputState.hpp
