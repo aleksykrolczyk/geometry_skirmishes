@@ -50,10 +50,10 @@ public:
 
     void init();
     void handleInput(const InputState& state) const;
-
     void update(f32 dt);
-
     void render();
+
+    const EntityManager& entityManager() const;
 };
 
 

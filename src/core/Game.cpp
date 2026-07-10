@@ -160,5 +160,8 @@ void Game::spawnEnemy(const Vec2f &at, i32 vertices, f32 radius, Vec2f velocity)
 
 void Game::render() {
     mRenderer.drawEntities(mEntityManager.getEntities());
-    mRenderer.commit();
+}
+
+const EntityManager& Game::entityManager() const {
+    return mEntityManager;
 }

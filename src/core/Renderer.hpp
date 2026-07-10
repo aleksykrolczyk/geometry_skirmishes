@@ -5,10 +5,9 @@
 
 class Renderer {
 public:
-    explicit Renderer(SDL_Window* window, SDL_Renderer* renderer, const Vec2f worldSize);
+    explicit Renderer(SDL_Window* window, SDL_Renderer* renderer, Vec2f worldSize);
 
     void drawEntities(const EntityVec& entities) const;
-    void commit() const;
 
     [[nodiscard]]
     Vec2f screenToWorld(const Vec2f &screen) const;

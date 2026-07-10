@@ -49,9 +49,6 @@ void Renderer::drawPolygon(const CPolygon& polygon, const CTransform& transform)
     SDL_RenderLines(mRenderer, vertices.data(), vertices.size());
 }
 
-void Renderer::commit() const {
-    SDL_RenderPresent(mRenderer);
-}
 
 Vec2f Renderer::screenToWorld(const Vec2f& screen) const {
     const float scale = std::min(

@@ -22,7 +22,15 @@ EntityVec & EntityManager::getEntities() {
 }
 
 EntityVec &EntityManager::getEntities(const EntityTag &tag) {
-    return mEntitiesMap[tag];
+    return mEntitiesMap.at(tag);
+}
+
+const EntityVec& EntityManager::getEntities() const {
+    return mEntities;
+}
+
+const EntityVec& EntityManager::getEntities(const EntityTag &tag) const {
+    return mEntitiesMap.at(tag);
 }
 
 std::shared_ptr<Entity> EntityManager::getFirst(const EntityTag &tag) {
