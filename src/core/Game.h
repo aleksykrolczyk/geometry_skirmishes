@@ -40,6 +40,7 @@ private:
     void sMovement(f32 dt);
     void sPlayerActions();
     void sEnemySpawn(f32 dt);
+    void sBoundary();
     void sAnimation(f32 dt);
 
     void spawnBullet(const Vec2f &from, const Vec2f &to);

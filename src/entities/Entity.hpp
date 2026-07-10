@@ -12,7 +12,8 @@ using ComponentTuple = std::tuple<
     CTransform,
     CInput,
     CCollision,
-    CVelocity
+    CVelocity,
+    CBoundary
 >;
 
 class Entity {

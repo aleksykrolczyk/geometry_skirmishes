@@ -1,5 +1,7 @@
 #include "Game.h"
 
+#include <algorithm>
+
 #include "Physics.hpp"
 #include "math/Vector.hpp"
 #include "../common/Random.hpp"
@@ -12,6 +14,7 @@ void Game::init() {
     mPlayer->addComponent<CVelocity>(Vec2f{0, 0});
     mPlayer->addComponent<CTransform>(mWorld.size / 2, 0, Vec2f{1});
     mPlayer->addComponent<CInput>();
+    mPlayer->addComponent<CBoundary>(CBoundary::BoundaryMode::Clamp);
 
     mCursor = mEntityManager.addEntity(EntityTag::Cursor);
     mCursor->addComponent<CPolygon>(20, 5, Color::WHITE);
@@ -40,6 +43,7 @@ void Game::update(const f32 dt) {
     sMovement(dt);
     sPlayerActions();
     sEnemySpawn(dt);
+    sBoundary();
     sAnimation(dt);
 }
 
@@ -126,6 +130,31 @@ void Game::sEnemySpawn(const f32 dt) {
     mEnemyTimer -= mConfig.enemySpawnDelay;
 }
 
+void Game::sBoundary() {
+    for (const auto& entity : mEntityManager.getEntities()) {
+        auto& boundary = entity->getComponent<CBoundary>();
+        auto& transform = entity->getComponent<CTransform>();
+        if (!boundary.exists || !transform.exists) continue;
+
+        const auto& p = transform.position;
+        const bool outside =
+            p.x < -boundary.margin ||
+            p.x > +boundary.margin + mWorld.size.x ||
+            p.y < -boundary.margin ||
+            p.y > +boundary.margin + mWorld.size.y;
+
+        if (!outside) continue;
+        switch (boundary.mode) {
+            case CBoundary::BoundaryMode::Clamp:
+                transform.position.x = std::ranges::clamp(transform.position.x, 0.0f, mWorld.size.x);
+                transform.position.y = std::ranges::clamp(transform.position.y, 0.0f, mWorld.size.y);
+                break;
+            case CBoundary::BoundaryMode::Destroy:
+                entity->destroy();
+        }
+    }
+}
+
 void Game::sAnimation(const f32 dt) {
     for (const auto& entity : mEntityManager.getEntities()) {
         auto& transform = entity->getComponent<CTransform>();
@@ -148,6 +177,7 @@ void Game::spawnBullet(const Vec2f& from, const Vec2f& to) {
     bullet->addComponent<CCollision>(mConfig.bulletRadius);
     bullet->addComponent<CTransform>(spawnPosition, 0, Vec2f{1});
     bullet->addComponent<CVelocity>(direction * mConfig.bulletSpeed);
+    bullet->addComponent<CBoundary>(CBoundary::BoundaryMode::Destroy, 2 * mConfig.bulletRadius);
 }
 
 void Game::spawnEnemy(const Vec2f &at, i32 vertices, f32 radius, Vec2f velocity) {
@@ -156,6 +186,8 @@ void Game::spawnEnemy(const Vec2f &at, i32 vertices, f32 radius, Vec2f velocity)
     enemy->addComponent<CCollision>(radius);
     enemy->addComponent<CTransform>(at, 0, Vec2f{1});
     enemy->addComponent<CVelocity>(velocity);
+    enemy->addComponent<CBoundary>(CBoundary::BoundaryMode::Destroy, 2 * radius);
+
 }
 
 void Game::render() {
