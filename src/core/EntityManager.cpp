@@ -22,7 +22,7 @@ EntityVec & EntityManager::getEntities() {
 }
 
 EntityVec &EntityManager::getEntities(const EntityTag &tag) {
-    return mEntitiesMap.at(tag);
+    return mEntitiesMap[tag];
 }
 
 const EntityVec& EntityManager::getEntities() const {

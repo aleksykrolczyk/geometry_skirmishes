@@ -13,7 +13,8 @@ using ComponentTuple = std::tuple<
     CInput,
     CCollision,
     CVelocity,
-    CBoundary
+    CBoundary,
+    CScore
 >;
 
 class Entity {

@@ -73,3 +73,14 @@ struct CBoundary : Component {
     CBoundary() = default;
     explicit CBoundary(const BoundaryMode mode, const f32 margin = 0): mode(mode), margin(margin) {}
 };
+
+struct CScore : Component {
+    i32 score = 0;
+
+    CScore() = default;
+    explicit CScore(const i32 score): score(score) {}
+
+    void addScore(const i32 s) {
+        score += s;
+    }
+};

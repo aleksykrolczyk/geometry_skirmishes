@@ -29,4 +29,8 @@ namespace Random
     inline f32 getFloat() {
         return getFloat(0.0f, 1.0f);
     }
+
+    inline bool getBool() {
+        return getInt() % 2 == 0;
+    }
 }

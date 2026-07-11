@@ -13,6 +13,8 @@ struct Color {
     static const Color BLACK;
     static const Color WHITE;
 
+    static const Color YELLOW;
+
     static const Color TRANSPARENT;
 
 

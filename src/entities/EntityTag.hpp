@@ -1,9 +1,11 @@
 #pragma once
 
 enum class EntityTag {
+    GameState,
     Player,
     Cursor,
     Enemy,
+    SmallEnemy,
     Neutral,
     Bullet,
 };

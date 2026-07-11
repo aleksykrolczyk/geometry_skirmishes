@@ -15,6 +15,7 @@ void Game::init() {
     mPlayer->addComponent<CTransform>(mWorld.size / 2, 0, Vec2f{1});
     mPlayer->addComponent<CInput>();
     mPlayer->addComponent<CBoundary>(CBoundary::BoundaryMode::Clamp);
+    mPlayer->addComponent<CScore>();
 
     mCursor = mEntityManager.addEntity(EntityTag::Cursor);
     mCursor->addComponent<CPolygon>(20, 5, Color::WHITE);
@@ -44,6 +45,7 @@ void Game::update(const f32 dt) {
     sPlayerActions();
     sEnemySpawn(dt);
     sBoundary();
+    SCollision();
     sAnimation(dt);
 }
 
@@ -155,6 +157,32 @@ void Game::sBoundary() {
     }
 }
 
+void Game::SCollision() {
+    for (auto& bullet : mEntityManager.getEntities(EntityTag::Bullet)) {
+        auto& bTransform = bullet->getComponent<CTransform>();
+        auto& bCollision = bullet->getComponent<CCollision>();
+        for (auto& enemy : mEntityManager.getEntities(EntityTag::Enemy)) {
+            auto& eTransform = enemy->getComponent<CTransform>();
+            auto& eCollision = enemy->getComponent<CCollision>();
+            if ((bTransform.position - eTransform.position).length() < bCollision.radius + eCollision.radius) {
+                spawnSmallEnemies(*enemy);
+                bullet->destroy();
+                enemy->destroy();
+                mPlayer->getComponent<CScore>().addScore(mConfig.enemyScore);
+            }
+        }
+        for (auto& smallEnemy : mEntityManager.getEntities(EntityTag::SmallEnemy)) {
+            auto& eTransform = smallEnemy->getComponent<CTransform>();
+            auto& eCollision = smallEnemy->getComponent<CCollision>();
+            if ((bTransform.position - eTransform.position).length() < bCollision.radius + eCollision.radius) {
+                bullet->destroy();
+                smallEnemy->destroy();
+                mPlayer->getComponent<CScore>().addScore(mConfig.smallEnemyScore);
+            }
+        }
+    }
+}
+
 void Game::sAnimation(const f32 dt) {
     for (const auto& entity : mEntityManager.getEntities()) {
         auto& transform = entity->getComponent<CTransform>();
@@ -190,10 +218,33 @@ void Game::spawnEnemy(const Vec2f &at, i32 vertices, f32 radius, Vec2f velocity)
 
 }
 
+void Game::spawnSmallEnemies(const Entity &parent) {
+    const auto& p = parent.getComponent<CPolygon>();
+    const auto& t = parent.getComponent<CTransform>();
+    const auto& v = parent.getComponent<CVelocity>();
+
+    const f32 step = 2.0f * std::numbers::pi_v<f32> / p.vertexCount;
+    const f32 newRadius = p.radius / 3;
+    for (u32 i = 0; i < p.vertexCount; i++) {
+        const auto& angle = t.rotation + step * i;
+        const auto& subEnemy = mEntityManager.addEntity(EntityTag::SmallEnemy);
+        subEnemy->addComponent<CPolygon>(p.vertexCount, newRadius, Color::YELLOW);
+        subEnemy->addComponent<CCollision>(newRadius);
+        subEnemy->addComponent<CTransform>(t.position + Vec2f{static_cast<f32>(p.radius), 0}.rotated(angle), 0, Vec2f{1});
+        subEnemy->addComponent<CVelocity>(Vec2f{1, 0}.rotated(angle) * v.velocity.length());
+        subEnemy->addComponent<CBoundary>(CBoundary::BoundaryMode::Destroy, 2 * newRadius);
+    }
+}
+
+
 void Game::render() {
     mRenderer.drawEntities(mEntityManager.getEntities());
 }
 
 const EntityManager& Game::entityManager() const {
     return mEntityManager;
+}
+
+i32 Game::score() const {
+    return mPlayer->getComponent<CScore>().score;
 }

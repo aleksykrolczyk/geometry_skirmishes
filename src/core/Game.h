@@ -17,6 +17,9 @@ struct GameConfig {
 
     i32 enemyMaxVertices = 8;
 
+    i32 enemyScore = 100;
+    i32 smallEnemyScore = 25;
+
 };
 
 struct World {
@@ -41,20 +44,26 @@ private:
     void sPlayerActions();
     void sEnemySpawn(f32 dt);
     void sBoundary();
+    void SCollision();
     void sAnimation(f32 dt);
 
     void spawnBullet(const Vec2f &from, const Vec2f &to);
     void spawnEnemy(const Vec2f &at, i32 vertices, f32 radius, Vec2f velocity);
+    void spawnSmallEnemies(const Entity& parent);
 
 public:
     explicit Game(SDL_Window* window, SDL_Renderer* render): mRenderer(window, render, mWorld.size) {};
 
     void init();
     void handleInput(const InputState& state) const;
+
+
     void update(f32 dt);
     void render();
 
     const EntityManager& entityManager() const;
+
+    i32 score() const;
 };
 
 
